@@ -52,6 +52,7 @@ h2 {
 }
 
 input,
+select,
 textarea {
   width: 100%;
   max-width: 100%;
@@ -74,7 +75,9 @@ button {
 }
 
 .student-form,
-.student-list {
+.lecture-form,
+.student-list,
+.attendance-page {
   background: #fff;
   border-radius: 16px;
   padding: 20px;
@@ -86,8 +89,192 @@ button {
   gap: 12px;
 }
 
+.lecture-form form {
+  display: grid;
+  gap: 12px;
+}
+
 .student-list {
   margin-top: 20px;
+}
+
+.attendance-page {
+  margin-top: 20px;
+}
+
+.attendance-summary {
+  display: flex;
+  gap: 12px;
+  margin: 14px 0 18px;
+  flex-wrap: wrap;
+}
+
+.attendance-count {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.present-count {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.absent-count {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.attendance-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.attendance-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.attendance-student {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.attendance-status {
+  text-transform: capitalize;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+}
+
+.attendance-status.present {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.attendance-status.absent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.attendance-status.unmarked {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.attendance-actions {
+  display: flex;
+  min-width: 120px;
+}
+
+.attendance-select {
+  width: 120px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.attendance-select.present {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.attendance-select.absent {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.lecture-list {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  margin-top: 20px;
+}
+
+.day-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.day-tab {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.day-tab.active {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #111827;
+}
+
+.timetable-day-title {
+  text-align: center;
+  font-size: 36px;
+  margin: 24px 0 18px;
+  font-weight: 500;
+}
+
+.timetable-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.timetable-card {
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9fafb;
+  border: 1px solid #d7dde7;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.timetable-card-time {
+  background: #2f3135;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+}
+
+.timetable-card-body {
+  text-align: center;
+  padding: 16px 14px;
+  color: #4b5563;
+  display: grid;
+  gap: 6px;
+  min-height: 120px;
+}
+
+.timetable-card-body p {
+  margin: 0;
+}
+
+.timetable-card-actions {
+  padding: 0 14px 14px;
+  justify-content: center;
 }
 
 .student-list ul,
@@ -140,4 +327,31 @@ button {
 
 .suggestions-list li:hover {
   background: #e2e8f0;
+}
+
+@media (max-width: 640px) {
+  .day-tabs {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .timetable-day-title {
+    font-size: 30px;
+  }
+
+  .timetable-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timetable-card-actions {
+    justify-content: flex-end;
+  }
+
+  .attendance-list li {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .attendance-actions {
+    justify-content: flex-end;
+  }
 }

@@ -1,154 +1,171 @@
-import { useEffect, useRef, useState } from "react";
-import StudentForm from "./Components/StudentForm";
-
-const STORAGE_KEY = "student-management-students";
+import { useState, useEffect } from "react";
 
 function App() {
-  const [students, setStudents] = useState(() => {
-    const savedStudents = localStorage.getItem(STORAGE_KEY);
-    return savedStudents ? JSON.parse(savedStudents) : [];
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    Password: "",
   });
-  const [searchText, setSearchText] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [editingStudent, setEditingStudent] = useState(null);
-  const searchInputRef = useRef(null);
+  const [students, setStudents] = useState([]);
+  const [showLogin, setShowLogin] = useState(false);
+const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-  }, [students]);
+const [loginData, setLoginData] = useState({
+  email: "",
+  Password: "",
+});
 
-  const addStudent = (student) => {
-    const newStudent = {
-      ...student,
-      id: Date.now().toString(),
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    setStudents((currentStudents) => [...currentStudents, newStudent]);
-    setShowForm(false);
-  };
-
-  const updateStudent = (updatedStudent) => {
-    setStudents((currentStudents) =>
-      currentStudents.map((student) =>
-        student.id === updatedStudent.id ? updatedStudent : student
-      )
-    );
-    setEditingStudent(null);
-    setShowForm(false);
-  };
-
-  const handleEdit = (student) => {
-    setEditingStudent(student);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id) => {
-    setStudents((currentStudents) =>
-      currentStudents.filter((student) => student.id !== id)
-    );
-
-    if (editingStudent?.id === id) {
-      setEditingStudent(null);
-      setShowForm(false);
-    }
-  };
-
-  const handleToggleForm = () => {
-    setShowForm((currentShowForm) => {
-      const nextShowForm = !currentShowForm;
-
-      if (!nextShowForm) {
-        setEditingStudent(null);
-      }
-
-      return nextShowForm;
+    setFormData({
+      ...formData,
+      [name]: value,
     });
   };
+  const handleLoginChange = (e) => {
+  const { name, value } = e.target;
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(searchText.toLowerCase())
+  setLoginData({
+    ...loginData,
+    [name]: value,
+  });
+};
+  const fetchUsers = async () => {
+  try {
+    const response = await fetch(
+      "https://662203b327fcd16fa6c87950.mockapi.io/api/v1/users"
+    );
+
+    const data = await response.json();
+
+    setStudents(data);
+    console.log("Users:", data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch(
+      "https://662203b327fcd16fa6c87950.mockapi.io/api/v1/users",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("User Added:", data);
+
+    // Refresh the user list
+    setShowLogin(true);
+
+setFormData({
+  name: "",
+  email: "",
+  Password: "",
+});
+
+    alert("Signup Successful!");
+  } catch (error) {
+    console.log(error);
+  }
+};
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  const response = await fetch(
+    "https://662203b327fcd16fa6c87950.mockapi.io/api/v1/users"
   );
 
-  const suggestions = searchText
-    ? students.filter((student) =>
-        student.name.toLowerCase().startsWith(searchText.toLowerCase())
-      )
-    : [];
+  const data = await response.json();
 
+  const user = data.find(
+    (u) =>
+      u.email === loginData.email &&
+      u.Password === loginData.Password
+  );
+
+  if (user) {
+    alert("Login Successful");
+    setStudents(data);
+    setIsLoggedIn(true);
+  } else {
+    alert("Invalid Email or Password");
+  }
+};
+  useEffect(() => {
+  fetchUsers();
+}, []);
   return (
-    <div className="app-shell">
-      <h1>Student Management System</h1>
-
-      <div className="toolbar">
-        <div className="search-wrap">
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Search student by name"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-
-          {suggestions.length > 0 && (
-            <ul className="suggestions-list">
-              {suggestions.map((student, index) => (
-                <li
-                  key={`${student.name}-${index}`}
-                  onClick={() => setSearchText(student.name)}
-                >
-                  {student.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <button
-          type="button"
-          className="search-button"
-          onClick={() => searchInputRef.current?.focus()}
-          aria-label="Focus search"
-        >
-          <span className="search-icon" aria-hidden="true" />
-        </button>
-
-        <button type="button" onClick={handleToggleForm}>
-          {showForm ? "Close Form" : "Add Student"}
-        </button>
-      </div>
-
-      {showForm && (
-        <StudentForm
-          addStudent={addStudent}
-          updateStudent={updateStudent}
-          editingStudent={editingStudent}
+    <div
+      style={{
+        width: "400px",
+        margin: "40px auto",
+        fontFamily: "Arial",
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
         />
-      )}
+        <br /><br />
 
-      <div className="student-list">
-        <h2>Students</h2>
-        {filteredStudents.length === 0 ? (
-          <p>No students added yet.</p>
-        ) : (
-          <ul>
-            {filteredStudents.map((student) => (
-              <li key={student.id}>
-                <div className="student-info">
-                  <strong>{student.name}</strong> - Age: {student.age} - CGPA: {student.cgpa}
-                </div>
-                <div className="student-actions">
-                  <button type="button" onClick={() => handleEdit(student)}>
-                    Edit
-                  </button>
-                  <button type="button" onClick={() => handleDelete(student.id)}>
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+        <input
+          type="text"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <br /><br />
+
+        <input
+          type="password"
+          name="Password"
+          placeholder="Password"
+          value={formData.Password}
+          onChange={handleChange}
+          required
+        />
+        
+        <br /><br />
+
+        <button type="submit">Sign Up</button>
+        <button type="button" onClick={() => setFormData({ name: "", email: "", Password: "", age: "" })}>Clear</button>
+      </form>
+      {students.length === 0 ? (
+        <p></p>
+      ) : (
+        students.map((student, index) => (
+          <div
+            key={index}
+            style={{
+              border: "1px solid gray",
+              padding: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <p><strong>Name:</strong> {student.name}</p>
+            <p><strong>Email:</strong> {student.email}</p>
+            <p><strong>Password:</strong> {student.Password}</p>
+          </div>
+        ))
+      )}
     </div>
   );
 }
